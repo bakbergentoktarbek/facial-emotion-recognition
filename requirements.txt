@@ -1,0 +1,13 @@
+tensorflow==2.16.2          # Keras 3 ішінде бар
+keras==3.3.3                # Compatible Keras generation for the teacher's TF
+jax==0.4.30                # MediaPipe dependency compatible with TF's ml-dtypes
+jaxlib==0.4.30
+numpy<2.0                   # TF 2.16 numpy 2-мен үйлеспейді
+opencv-contrib-python==4.10.0.84 # Includes OpenCV; also required by MediaPipe
+mediapipe==0.10.14          # заманауи бетті анықтау
+pillow>=10.1                # қазақ әріптерін экранға жазу үшін
+matplotlib>=3.8
+seaborn>=0.13               # confusion matrix heatmap
+scikit-learn>=1.4           # classification_report, confusion_matrix
+gradio>=5.0,<6              # Keep the example's API generation
+kaggle>=1.6                 # датасетті жүктеу

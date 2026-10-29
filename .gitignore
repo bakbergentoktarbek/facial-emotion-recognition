@@ -218,3 +218,23 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Facial emotion project: local data, environments and training artifacts
+.venv/
+.wheels/
+__pycache__/
+*.py[cod]
+data/fer2013/*
+!data/fer2013/.gitkeep
+models/*
+!models/.gitkeep
+reports/*
+!reports/.gitkeep
+kaggle.json
+.env
+highscore.json
+
+# Shared train/validation split for reproducible team comparisons
+!reports/data_split_seed42.json
+.env.*
+!.env.example
