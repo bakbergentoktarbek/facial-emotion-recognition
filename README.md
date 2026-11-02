@@ -67,7 +67,9 @@
 Нақты нәтижелер мен модельдердің SHA-256 мәндері:
 [салыстыру нәтижелері](reports/comparison_cnn_mobilenet.json).
 Жеке метрикалар, жіктеу есептері, қателесу матрицалары және оқыту графиктері де
-`reports/` бумасында жарияланған. Модель файлдары бөлек беріледі.
+`reports/` бумасында жарияланған. Модель файлдары
+[GitHub Release](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/tag/v1.0-models)
+бөлімінде бөлек берілген.
 
 ## Командамен жұмыс істеу
 
@@ -76,11 +78,23 @@ git clone https://github.com/bakbergentoktarbek/facial-emotion-recognition.git
 cd facial-emotion-recognition
 ```
 
-Репозиторийді көшіргеннен кейін кітапханаларды орнатып, FER-2013 жиынын жүктеңіз.
+Репозиторийді көшіргеннен кейін кітапханаларды орнатыңыз. Камера, веб-интерфейс
+және ойын үшін дайын модельді төмендегі сілтемеден жүктеу жеткілікті.
+FER-2013 жиыны тек қайта оқыту, деректерді зерттеу немесе тестілеу үшін қажет.
 Деректер жиыны, `.venv`, `.wheels` кэші, оқытылған модельдер мен оқыту журналдары
 жергілікті компьютерде қалады және Git-ке қосылмайды. Оқытылған
-`models/emotion_cnn.keras` және `models/emotion_mobilenet.keras` файлдары команда
-мүшелеріне бөлек беріледі; алынған файлдарды `models/` бумасына орналастырыңыз.
+модельдерді [v1.0-models релизінің Assets бөлімінен](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/tag/v1.0-models)
+жүктеп, атауларын өзгертпей `models/` бумасына орналастырыңыз:
+
+- [emotion_cnn.keras](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/download/v1.0-models/emotion_cnn.keras) — камера, интерфейс және ойын үшін негізгі модель;
+- [emotion_mobilenet.keras](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/download/v1.0-models/emotion_mobilenet.keras) — салыстыруға арналған екінші модель.
+
+Қайта оқыту қажет емес. Релиздегі `SHA256SUMS.txt` арқылы файлдардың тұтастығын
+тексеруге болады. Windows-та хэшті көру командасы:
+
+```powershell
+Get-FileHash models/emotion_cnn.keras -Algorithm SHA256
+```
 
 Git-те `reports/data_split_seed42.json` сақталады: онда `data/fer2013` бумасына
 қатысты жолдармен берілген оқыту және валидация файлдарының тізімдері бар.
