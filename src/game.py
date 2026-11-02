@@ -5,6 +5,7 @@ import os
 import random
 import time
 import cv2
+from camera import open_camera, read_camera_frame
 from config import BASE_DIR, EMOTIONS_EN, EMOTIONS_KZ, EMOTION_COLORS, MODEL_PATH
 from face_detect import get_detector
 from predictor import EmotionPredictor, crop_face, draw_label, put_text
@@ -135,14 +136,12 @@ class EmotionGame:
                 self.next_round()
 
     def run(self, cam_index=0):
-        cap = cv2.VideoCapture(cam_index)
+        cap = open_camera(cam_index)
         if not cap.isOpened():
             raise SystemExit("Камера ашылмады")
         prev = time.time()
         while True:
-            ok, frame = cap.read()
-            if not ok:
-                break
+            frame = read_camera_frame(cap)
             frame = cv2.flip(frame, 1)
             now = time.time()
             dt, prev = now - prev, now

@@ -2,6 +2,7 @@
 import argparse
 import time
 import cv2
+from camera import open_camera, read_camera_frame
 from config import EMOTIONS_EN, MODEL_PATH
 from face_detect import get_detector
 from predictor import EmotionPredictor, crop_face, draw_label, put_text
@@ -38,27 +39,28 @@ def run_image(path, detector, predictor):
     cv2.waitKey(0)
 
 
-def run_webcam(cam_index, detector, predictor):
-    cap = cv2.VideoCapture(cam_index)
-    if not cap.isOpened():
-        raise SystemExit("Камера ашылмады: --camera 1 көріңіз немесе Zoom/Teams-ті жабыңыз")
+def run_webcam(cam_index, detector, predictor, backend="auto"):
+    cap = open_camera(cam_index, backend)
     ema, prev = None, time.time()
-    while True:
-        ok, frame = cap.read()
-        if not ok:
-            break
-        frame = cv2.flip(frame, 1)
-        frame, ema = annotate(frame, detector, predictor, ema)
-        now = time.time()
-        fps, prev = 1.0 / max(now - prev, 1e-6), now
-        cv2.putText(frame, f"FPS: {fps:.0f}", (10, frame.shape[0] - 15),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-        cv2.imshow("Emotion recognition (q - exit)", frame)
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord("q"):
-            break
-    cap.release()
-    cv2.destroyAllWindows()
+    title = "Emotion recognition (q - exit)"
+    try:
+        while True:
+            frame = read_camera_frame(cap)
+            frame = cv2.flip(frame, 1)
+            frame, ema = annotate(frame, detector, predictor, ema)
+            now = time.time()
+            fps, prev = 1.0 / max(now - prev, 1e-6), now
+            cv2.putText(frame, f"FPS: {fps:.0f}", (10, frame.shape[0] - 15),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+            cv2.imshow(title, frame)
+            key = cv2.waitKey(1) & 0xFF
+            if key in (ord("q"), ord("Q"), 27):
+                break
+            if cv2.getWindowProperty(title, cv2.WND_PROP_VISIBLE) < 1:
+                break
+    finally:
+        cap.release()
+        cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
@@ -66,10 +68,15 @@ if __name__ == "__main__":
     p.add_argument("--model", default=MODEL_PATH)
     p.add_argument("--detector", choices=["mediapipe", "haar"], default="mediapipe")
     p.add_argument("--camera", type=int, default=0)
+    p.add_argument("--backend", choices=["auto", "dshow", "msmf", "any"], default="auto")
     p.add_argument("--image", help="Камера орнына бір суретті талдау")
     args = p.parse_args()
-    detector, predictor = get_detector(args.detector), EmotionPredictor(args.model)
+    print("Initializing face detector...", flush=True)
+    detector = get_detector(args.detector)
+    print("Loading emotion model and warming it up...", flush=True)
+    predictor = EmotionPredictor(args.model)
+    print("Emotion model ready.", flush=True)
     if args.image:
         run_image(args.image, detector, predictor)
     else:
-        run_webcam(args.camera, detector, predictor)
+        run_webcam(args.camera, detector, predictor, args.backend)

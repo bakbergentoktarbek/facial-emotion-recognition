@@ -1,6 +1,9 @@
 # src/evaluate.py
 import argparse
 import os
+import json
+import hashlib
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -13,25 +16,53 @@ from data import load_datasets
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--model", default=MODEL_PATH)
+    p.add_argument("--no-show", action="store_true", help="Save figures without opening windows")
+    p.add_argument("--threads", type=int, default=min(8, os.cpu_count() or 1))
     args = p.parse_args()
+    if args.threads < 1:
+        p.error("threads must be positive")
+    tf.config.threading.set_intra_op_parallelism_threads(args.threads)
+    tf.config.threading.set_inter_op_parallelism_threads(2)
     os.makedirs(REPORTS_DIR, exist_ok=True)
     tag = os.path.splitext(os.path.basename(args.model))[0]
 
-    model = tf.keras.models.load_model(args.model)
+    model = tf.keras.models.load_model(args.model, compile=False)
+    print(f"Evaluating frozen checkpoint on held-out test images: {args.model}", flush=True)
     _, _, test_ds = load_datasets()
     names = [EMOTIONS_KZ[e] for e in EMOTIONS_EN]
 
     # test_ds shuffle=False → суреттер мен белгілердің реті екі өтуде де бірдей
     y_true = np.concatenate([y.numpy() for _, y in test_ds])
-    probs = model.predict(test_ds, verbose=1)
+    probs = model.predict(test_ds, verbose=2)
+    if probs.shape != (len(y_true), len(EMOTIONS_EN)) or not np.isfinite(probs).all():
+        raise ValueError("Invalid model probabilities")
     y_pred = probs.argmax(axis=1)
 
     print(f"\nTest accuracy: {accuracy_score(y_true, y_pred):.3f}\n")
-    print(classification_report(y_true, y_pred, target_names=names, digits=3))
+    report_text = classification_report(y_true, y_pred, labels=range(len(names)),
+                                        target_names=names, digits=4, zero_division=0)
+    print(report_text)
+    report = classification_report(y_true, y_pred, labels=range(len(names)),
+                                   target_names=EMOTIONS_EN, output_dict=True, zero_division=0)
 
     # 1) Confusion matrix (жол бойынша нормаланған: әр шын класстың қанша пайызы қайда кетті)
-    cm = confusion_matrix(y_true, y_pred)
+    cm = confusion_matrix(y_true, y_pred, labels=range(len(names)))
     cm_norm = cm / cm.sum(axis=1, keepdims=True)
+    with open(args.model, "rb") as checkpoint:
+        checkpoint_hash = hashlib.file_digest(checkpoint, "sha256").hexdigest()
+    metrics = {"model": os.path.basename(args.model), "model_sha256": checkpoint_hash,
+               "test_samples": len(y_true), "accuracy": float(accuracy_score(y_true, y_pred)),
+               "macro_f1": report["macro avg"]["f1-score"],
+               "weighted_f1": report["weighted avg"]["f1-score"],
+               "class_names": EMOTIONS_EN, "classification_report": report,
+               "confusion_matrix": cm.tolist()}
+    Path(REPORTS_DIR, f"metrics_{tag}.json").write_text(
+        json.dumps(metrics, indent=2, ensure_ascii=False), encoding="utf-8")
+    Path(REPORTS_DIR, f"classification_{tag}.txt").write_text(
+        f"Test samples: {len(y_true)}\nTest accuracy: {metrics['accuracy']:.6f}\n\n" + report_text,
+        encoding="utf-8")
+    np.savez_compressed(os.path.join(REPORTS_DIR, f"predictions_{tag}.npz"),
+                        y_true=y_true, y_pred=y_pred, probabilities=probs)
     plt.figure(figsize=(8, 6.5))
     sns.heatmap(cm_norm, annot=True, fmt=".2f", cmap="Blues",
                 xticklabels=names, yticklabels=names, vmin=0, vmax=1)
@@ -61,7 +92,10 @@ def main():
         ax.axis("off")
     plt.tight_layout()
     plt.savefig(os.path.join(REPORTS_DIR, f"errors_{tag}.png"), dpi=150)
-    plt.show()
+    if not args.no_show:
+        plt.show()
+    plt.close("all")
+    print(f"Evaluation complete. Reports saved in: {REPORTS_DIR}", flush=True)
 
 
 if __name__ == "__main__":

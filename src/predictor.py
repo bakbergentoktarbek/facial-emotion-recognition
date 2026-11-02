@@ -3,7 +3,6 @@ import functools
 from pathlib import Path
 import cv2
 import numpy as np
-import tensorflow as tf
 from PIL import Image, ImageDraw, ImageFont
 from config import EMOTIONS_EN, EMOTIONS_KZ, EMOTION_COLORS, FONT_CANDIDATES, IMG_SIZE, MODEL_PATH
 
@@ -13,7 +12,8 @@ class EmotionPredictor:
         if not Path(model_path).is_file():
             raise FileNotFoundError(
                 f"Model not found: {model_path}. Train CNN first; see README.md.")
-        self.model = tf.keras.models.load_model(model_path)
+        import tensorflow as tf
+        self.model = tf.keras.models.load_model(model_path, compile=False)
         self.model(np.zeros((1, IMG_SIZE, IMG_SIZE, 1), np.float32), training=False)  # "қыздыру"
 
     @staticmethod

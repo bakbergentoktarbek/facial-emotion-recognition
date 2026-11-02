@@ -236,5 +236,16 @@ highscore.json
 
 # Shared train/validation split for reproducible team comparisons
 !reports/data_split_seed42.json
+!reports/comparison_cnn_mobilenet.json
+!reports/metrics_emotion_cnn.json
+!reports/metrics_emotion_mobilenet.json
+!reports/classification_emotion_cnn.txt
+!reports/classification_emotion_mobilenet.txt
+!reports/confusion_emotion_cnn.png
+!reports/confusion_emotion_mobilenet.png
+!reports/history_cnn.json
+!reports/history_cnn.png
+!reports/history_mobilenet.json
+!reports/history_mobilenet.png
 .env.*
 !.env.example

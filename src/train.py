@@ -132,14 +132,18 @@ def main():
         print("1-кезең: frozen base")
         compile_model(model, 1e-3)
         h1 = model.fit(train_ds, validation_data=val_ds, epochs=10,
-                       class_weight=class_weight, callbacks=get_callbacks(path))
+                       class_weight=class_weight,
+                       callbacks=get_callbacks(path, name="mobilenet_frozen"), verbose=2)
         print("2-кезең: fine-tuning")
         unfreeze_top(base, 30)
         compile_model(model, 1e-5)  # trainable өзгерген соң қайта compile міндетті!
         h2 = model.fit(train_ds, validation_data=val_ds, epochs=args.epochs,
                        class_weight=class_weight,
-                       callbacks=get_callbacks(path, max(h1.history["val_accuracy"])))
+                       callbacks=get_callbacks(path, max(h1.history["val_accuracy"]),
+                                               name="mobilenet_finetune"), verbose=2)
         history = merge(h1, h2)
+        Path(REPORTS_DIR, "history_mobilenet.json").write_text(
+            json.dumps(history, indent=2), encoding="utf-8")
 
     plot_history(history, args.model)
     # ModelCheckpoint already saved the best model. Do not overwrite it or use

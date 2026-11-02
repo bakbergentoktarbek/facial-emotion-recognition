@@ -58,14 +58,13 @@ def get_detector(name="mediapipe"):
 if __name__ == "__main__":
     # 1-апта тапсырмасы: екі детекторды қатар салыстыру. 'm' — ауыстыру, 'q' — шығу
     import argparse
+    from camera import open_camera, read_camera_frame
     parser = argparse.ArgumentParser(description="Compare face detectors; M switches, Q exits.")
     parser.add_argument("--camera", type=int, default=0)
     parser.add_argument("--detector", choices=["haar", "mediapipe"], default="haar")
+    parser.add_argument("--backend", choices=["auto", "dshow", "msmf", "any"], default="auto")
     args = parser.parse_args()
-    cap = cv2.VideoCapture(args.camera)
-    if not cap.isOpened():
-        cap.release()
-        raise SystemExit("Camera unavailable. Close Zoom/Teams or try --camera 1.")
+    cap = open_camera(args.camera, args.backend)
     detectors = {"Haar": HaarFaceDetector()}
     try:
         detectors["MediaPipe"] = MediaPipeFaceDetector()
@@ -73,9 +72,7 @@ if __name__ == "__main__":
         print(f"MediaPipe unavailable: {error}. Using Haar.")
     current = "MediaPipe" if args.detector == "mediapipe" and "MediaPipe" in detectors else "Haar"
     while True:
-        ok, frame = cap.read()
-        if not ok:
-            break
+        frame = read_camera_frame(cap)
         frame = cv2.flip(frame, 1)  # айна сияқты көрсету
         for (x, y, w, h) in detectors[current].detect(frame):
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
