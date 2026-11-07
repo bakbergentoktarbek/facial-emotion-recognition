@@ -1,0 +1,22 @@
+{
+  "cnn": {
+    "model": "emotion_cnn_kdef.keras",
+    "model_sha256": "4d4b7f9b465714d52d208c60af8dd5009ff6c3175312f7c36a0cc1ea3da392d3",
+    "test_samples": 768,
+    "accuracy": 0.80078125,
+    "macro_f1": 0.796487851170487,
+    "weighted_f1": 0.7963091313061659,
+    "above_70_percent": true,
+    "best_val_accuracy": 0.7928571701049805
+  },
+  "mobilenet": {
+    "model": "emotion_mobilenet_kdef.keras",
+    "model_sha256": "b7962afcd405c66e99936677f63db139080079011703c9caf4514604b2b72eb4",
+    "test_samples": 768,
+    "accuracy": 0.8333333333333334,
+    "macro_f1": 0.8253990329159916,
+    "weighted_f1": 0.8251940575094158,
+    "above_70_percent": true,
+    "best_val_accuracy": 0.7971428632736206
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "dataset": "KDEF original",
+  "model": "emotion_mobilenet_kdef.keras",
+  "model_sha256": "b7962afcd405c66e99936677f63db139080079011703c9caf4514604b2b72eb4",
+  "manifest_sha256": "017f7e3881750edc0c8e4f42b81b98d5fe1e6d8ce49c315172c80ad54860f732",
+  "test_samples": 768,
+  "test_subjects": [
+    "F07",
+    "F08",
+    "F15",
+    "F21",
+    "F29",
+    "F35",
+    "M03",
+    "M07",
+    "M09",
+    "M21",
+    "M34"
+  ],
+  "class_names": [
+    "angry",
+    "disgust",
+    "fear",
+    "happy",
+    "neutral",
+    "sad",
+    "surprise"
+  ],
+  "accuracy": 0.8333333333333334,
+  "macro_f1": 0.8253990329159916,
+  "weighted_f1": 0.8251940575094158,
+  "classification_report": {
+    "angry": {
+      "precision": 0.7899159663865546,
+      "recall": 0.8545454545454545,
+      "f1-score": 0.8209606986899564,
+      "support": 110.0
+    },
+    "disgust": {
+      "precision": 0.8918918918918919,
+      "recall": 0.9166666666666666,
+      "f1-score": 0.9041095890410958,
+      "support": 108.0
+    },
+    "fear": {
+      "precision": 0.7088607594936709,
+      "recall": 0.509090909090909,
+      "f1-score": 0.5925925925925926,
+      "support": 110.0
+    },
+    "happy": {
+      "precision": 0.873015873015873,
+      "recall": 1.0,
+      "f1-score": 0.9322033898305084,
+      "support": 110.0
+    },
+    "neutral": {
+      "precision": 0.8898305084745762,
+      "recall": 0.9545454545454546,
+      "f1-score": 0.9210526315789473,
+      "support": 110.0
+    },
+    "sad": {
+      "precision": 0.9,
+      "recall": 0.6545454545454545,
+      "f1-score": 0.7578947368421053,
+      "support": 110.0
+    },
+    "surprise": {
+      "precision": 0.7703703703703704,
+      "recall": 0.9454545454545454,
+      "f1-score": 0.8489795918367347,
+      "support": 110.0
+    },
+    "accuracy": 0.8333333333333334,
+    "macro avg": {
+      "precision": 0.8319836242332769,
+      "recall": 0.8335497835497835,
+      "f1-score": 0.8253990329159916,
+      "support": 768.0
+    },
+    "weighted avg": {
+      "precision": 0.8318276131195824,
+      "recall": 0.8333333333333334,
+      "f1-score": 0.8251940575094158,
+      "support": 768.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      94,
+      4,
+      7,
+      0,
+      0,
+      4,
+      1
+    ],
+    [
+      7,
+      99,
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    [
+      7,
+      5,
+      56,
+      11,
+      1,
+      4,
+      26
+    ],
+    [
+      0,
+      0,
+      0,
+      110,
+      0,
+      0,
+      0
+    ],
+    [
+      4,
+      0,
+      0,
+      1,
+      105,
+      0,
+      0
+    ],
+    [
+      7,
+      3,
+      10,
+      3,
+      12,
+      72,
+      3
+    ],
+    [
+      0,
+      0,
+      6,
+      0,
+      0,
+      0,
+      104
+    ]
+  ],
+  "per_angle": {
+    "FL": {
+      "samples": 153,
+      "accuracy": 0.8169934640522876
+    },
+    "FR": {
+      "samples": 153,
+      "accuracy": 0.8104575163398693
+    },
+    "HL": {
+      "samples": 154,
+      "accuracy": 0.8571428571428571
+    },
+    "HR": {
+      "samples": 154,
+      "accuracy": 0.8571428571428571
+    },
+    "S": {
+      "samples": 154,
+      "accuracy": 0.8246753246753247
+    }
+  },
+  "above_70_percent": true
+}

@@ -1,0 +1,10 @@
+{
+  "state": "finished",
+  "best_val_accuracy": 0.7971428632736206,
+  "epochs_completed": 51,
+  "model": "emotion_mobilenet_kdef.keras",
+  "model_sha256": "b7962afcd405c66e99936677f63db139080079011703c9caf4514604b2b72eb4",
+  "manifest_sha256": "017f7e3881750edc0c8e4f42b81b98d5fe1e6d8ce49c315172c80ad54860f732",
+  "test_evaluated": true,
+  "test_metrics": "reports/kdef/mobilenet/metrics.json"
+}

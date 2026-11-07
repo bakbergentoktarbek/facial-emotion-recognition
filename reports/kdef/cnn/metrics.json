@@ -1,0 +1,177 @@
+{
+  "dataset": "KDEF original",
+  "model": "emotion_cnn_kdef.keras",
+  "model_sha256": "4d4b7f9b465714d52d208c60af8dd5009ff6c3175312f7c36a0cc1ea3da392d3",
+  "manifest_sha256": "017f7e3881750edc0c8e4f42b81b98d5fe1e6d8ce49c315172c80ad54860f732",
+  "test_samples": 768,
+  "test_subjects": [
+    "F07",
+    "F08",
+    "F15",
+    "F21",
+    "F29",
+    "F35",
+    "M03",
+    "M07",
+    "M09",
+    "M21",
+    "M34"
+  ],
+  "class_names": [
+    "angry",
+    "disgust",
+    "fear",
+    "happy",
+    "neutral",
+    "sad",
+    "surprise"
+  ],
+  "accuracy": 0.80078125,
+  "macro_f1": 0.796487851170487,
+  "weighted_f1": 0.7963091313061659,
+  "classification_report": {
+    "angry": {
+      "precision": 0.6916666666666667,
+      "recall": 0.7545454545454545,
+      "f1-score": 0.7217391304347827,
+      "support": 110.0
+    },
+    "disgust": {
+      "precision": 0.8691588785046729,
+      "recall": 0.8611111111111112,
+      "f1-score": 0.8651162790697674,
+      "support": 108.0
+    },
+    "fear": {
+      "precision": 0.7195121951219512,
+      "recall": 0.5363636363636364,
+      "f1-score": 0.6145833333333334,
+      "support": 110.0
+    },
+    "happy": {
+      "precision": 0.9090909090909091,
+      "recall": 1.0,
+      "f1-score": 0.9523809523809523,
+      "support": 110.0
+    },
+    "neutral": {
+      "precision": 0.8545454545454545,
+      "recall": 0.8545454545454545,
+      "f1-score": 0.8545454545454545,
+      "support": 110.0
+    },
+    "sad": {
+      "precision": 0.7358490566037735,
+      "recall": 0.7090909090909091,
+      "f1-score": 0.7222222222222222,
+      "support": 110.0
+    },
+    "surprise": {
+      "precision": 0.8032786885245902,
+      "recall": 0.8909090909090909,
+      "f1-score": 0.8448275862068966,
+      "support": 110.0
+    },
+    "accuracy": 0.80078125,
+    "macro avg": {
+      "precision": 0.7975859784368596,
+      "recall": 0.8009379509379508,
+      "f1-score": 0.796487851170487,
+      "support": 768.0
+    },
+    "weighted avg": {
+      "precision": 0.7973995906762665,
+      "recall": 0.80078125,
+      "f1-score": 0.7963091313061659,
+      "support": 768.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      83,
+      9,
+      0,
+      0,
+      5,
+      12,
+      1
+    ],
+    [
+      9,
+      93,
+      0,
+      3,
+      0,
+      3,
+      0
+    ],
+    [
+      9,
+      4,
+      59,
+      7,
+      1,
+      7,
+      23
+    ],
+    [
+      0,
+      0,
+      0,
+      110,
+      0,
+      0,
+      0
+    ],
+    [
+      10,
+      0,
+      0,
+      0,
+      94,
+      6,
+      0
+    ],
+    [
+      9,
+      1,
+      12,
+      0,
+      10,
+      78,
+      0
+    ],
+    [
+      0,
+      0,
+      11,
+      1,
+      0,
+      0,
+      98
+    ]
+  ],
+  "per_angle": {
+    "FL": {
+      "samples": 153,
+      "accuracy": 0.738562091503268
+    },
+    "FR": {
+      "samples": 153,
+      "accuracy": 0.7254901960784313
+    },
+    "HL": {
+      "samples": 154,
+      "accuracy": 0.8441558441558441
+    },
+    "HR": {
+      "samples": 154,
+      "accuracy": 0.8246753246753247
+    },
+    "S": {
+      "samples": 154,
+      "accuracy": 0.8701298701298701
+    }
+  },
+  "above_70_percent": true
+}

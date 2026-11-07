@@ -1,0 +1,30 @@
+{
+  "dataset": "KDEF original",
+  "model": "mobilenet",
+  "seed": 42,
+  "manifest_sha256": "017f7e3881750edc0c8e4f42b81b98d5fe1e6d8ce49c315172c80ad54860f732",
+  "input_shape": [
+    160,
+    160,
+    3
+  ],
+  "preprocessing": "RGB JPEG; trim top/bottom 8% with fixed crop; resize; CNN grayscale, MobileNet RGB; values 0..255",
+  "initial_weights": "reports\\.keras\\models\\mobilenet_v2_weights_tf_dim_ordering_tf_kernels_1.0_96_no_top.h5",
+  "initial_weights_sha256": "8b474d1d1d281884fdbae8a4ff671a6c8edbbb62605cfbf6c7e827424bf91739",
+  "batch": 32,
+  "epochs_limit": 60,
+  "frozen_epochs_limit": 8,
+  "class_weights": null,
+  "selection_metric": "val_accuracy",
+  "test_loaded": false,
+  "train_samples": 3420,
+  "validation_samples": 700,
+  "tensorflow": "2.16.2",
+  "keras": "3.3.3",
+  "code_sha256": {
+    "train_kdef.py": "b631052aa659989b5109c1ae5cf927779e4a317bdefcb8734252f9fe5a309d9f",
+    "data_kdef.py": "a7ae687cb5d5319aef45fe9d81867391bacd8a1521be943612ca6c73b66a28c5",
+    "model_kdef.py": "3fe315516420557be40db7c1f002702772b29a62620015d3f7d75b93ce6e33a8",
+    "model_cnn.py": "dc19782092ad40f463ee6de888fadb9c1e693acd9a4c1df8782ab9d5d4e44ebd"
+  }
+}
