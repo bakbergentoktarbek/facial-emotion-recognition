@@ -23,7 +23,16 @@ EMOTION_COLORS = {
 
 CNN_PATH = os.path.join(MODELS_DIR, "emotion_cnn.keras")
 MOBILENET_PATH = os.path.join(MODELS_DIR, "emotion_mobilenet.keras")
-MODEL_PATH = CNN_PATH  # демо мен ойын қолданатын модель
+KDEF_CNN_PATH = os.path.join(MODELS_DIR, "emotion_cnn_kdef.keras")
+KDEF_MOBILENET_PATH = os.path.join(MODELS_DIR, "emotion_mobilenet_kdef.keras")
+MODEL_PATH = CNN_PATH  # FER бағалауы, Gradio және ойынның бұрынғы әдепкі моделі
+WEBCAM_MODEL_PATH = KDEF_MOBILENET_PATH
+MODEL_ALIASES = {
+    "mobilenet-kdef": KDEF_MOBILENET_PATH,
+    "cnn-kdef": KDEF_CNN_PATH,
+    "cnn-fer": CNN_PATH,
+    "mobilenet-fer": MOBILENET_PATH,
+}
 
 # Қазақ әріптерін (Ә, Ғ, Қ, Ң, Ө, Ұ, Ү, І) жаза алатын қаріптер — біріншісі табылғаны алынады
 FONT_CANDIDATES = [

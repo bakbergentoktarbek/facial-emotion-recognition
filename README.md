@@ -13,8 +13,9 @@
   768 суреті қолданылды. Дайындау мен оқыту:
   [KDEF_EXPERIMENT.md](KDEF_EXPERIMENT.md).
 - KDEF модельдері [v2.0-kdef релизінде](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/tag/v2.0-kdef)
-  бөлек берілген. Қазіргі камера көрсетілімі әзірге бұрынғы FER-2013 CNN
-  моделін қолданады; жаңа модельдердің кіріс өлшемдері басқа.
+  бөлек берілген. Камера әдепкіде KDEF MobileNetV2 моделін қолданады;
+  KDEF CNN және бұрынғы FER-2013 модельдерін `--model` арқылы таңдауға болады.
+  Кіріс өлшемі мен түс арналары модельге сай автоматты дайындалады.
 - Жоба бумалары құрылып, оқытушының 11 бастапқы модулі көшірілді.
 - Windows үшін орнату командалары мен ортаны тексеру құралы дайындалды.
 - Кітапханалар `.venv` ортасына орнатылды (Python 3.11). `pip check` тәуелділіктер
@@ -82,8 +83,33 @@ CNN FER-2013 моделінің көшірмесінен дооқытылды; M
 - [emotion_cnn_kdef.keras](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/download/v2.0-kdef/emotion_cnn_kdef.keras) — 96×96×1, сұр кескін;
 - [emotion_mobilenet_kdef.keras](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/download/v2.0-kdef/emotion_mobilenet_kdef.keras) — 160×160×3, RGB.
 
-Бұл модельдерді қазіргі `webcam_demo.py --model ...` командасына тікелей
-беруге болмайды: көрсетілім әлі 48×48×1 кірісін дайындайды.
+Камераны әдепкі KDEF MobileNetV2 моделімен іске қосу:
+
+```powershell
+.\.venv\Scripts\python.exe src/webcam_demo.py
+```
+
+KDEF CNN моделін салыстыру үшін:
+
+```powershell
+.\.venv\Scripts\python.exe src/webcam_demo.py --model cnn-kdef
+```
+
+Бір уақытта бір модель қолданылады. Терезенің төменгі жағында таңдалған
+модельдің атауы көрсетіледі. Модельді ауыстыру үшін терезені жауып, басқа
+параметрмен қайта іске қосыңыз. `--model` параметріне `.keras` файлының
+жолын да беруге болады. KDEF үшін RGB/сұр түске айналдыру, 8% қию,
+өлшемді өзгерту және дөңгелектеу оқытудағы функциямен бірдей орындалады.
+
+| `--model` мәні | Модель |
+|---|---|
+| `mobilenet-kdef` | MobileNetV2, KDEF — әдепкі |
+| `cnn-kdef` | CNN, KDEF |
+| `cnn-fer` | CNN, FER-2013 |
+| `mobilenet-fer` | MobileNetV2, FER-2013 |
+
+Бұл — KDEF тестінің дәлдігі; веб-камера сапасы жарыққа, ракурсқа және
+бет кескінінің KDEF фотосуреттерінен айырмашылығына тәуелді.
 KDEF тестін қайталау үшін ресми деректер қажет; оқыту мен бағалау командалары
 [тәжірибе нұсқаулығында](KDEF_EXPERIMENT.md) берілген.
 
@@ -100,7 +126,7 @@ KDEF тестін қайталау үшін ресми деректер қаже
 | Weighted F1 | **0,6064** | 0,4781 |
 
 Осы тәжірибеде CNN тест дәлдігі бойынша 13,83 пайыздық тармаққа жоғары нәтиже
-көрсетті және көрсетілім үшін негізгі модель ретінде қалдырылды. Бұл қорытынды
+көрсетті және алғашқы көрсетілімде негізгі модель болды. Бұл қорытынды
 осы баптауларға қатысты; MobileNetV2 барлық жағдайда нашар дегенді білдірмейді.
 Нақты нәтижелер мен модельдердің SHA-256 мәндері:
 [салыстыру нәтижелері](reports/comparison_cnn_mobilenet.json).
@@ -116,15 +142,18 @@ git clone https://github.com/bakbergentoktarbek/facial-emotion-recognition.git
 cd facial-emotion-recognition
 ```
 
-Репозиторийді көшіргеннен кейін кітапханаларды орнатыңыз. Камера, веб-интерфейс
-және ойын үшін дайын модельді төмендегі сілтемеден жүктеу жеткілікті.
+Репозиторийді көшіргеннен кейін кітапханаларды орнатыңыз. Камера үшін
+[v2.0-kdef](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/tag/v2.0-kdef)
+релизінен `emotion_mobilenet_kdef.keras` файлын жүктеңіз; салыстыруға
+`emotion_cnn_kdef.keras` файлын да алуға болады. Файлдарды `models/` бумасына салыңыз.
+Gradio мен ойынның қазіргі әдепкі моделі — төмендегі FER-2013 CNN.
 FER-2013 жиыны тек қайта оқыту, деректерді зерттеу немесе тестілеу үшін қажет.
 Деректер жиыны, `.venv`, `.wheels` кэші, оқытылған модельдер мен оқыту журналдары
 жергілікті компьютерде қалады және Git-ке қосылмайды. Оқытылған
 модельдерді [v1.0-models релизінің Assets бөлімінен](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/tag/v1.0-models)
 жүктеп, атауларын өзгертпей `models/` бумасына орналастырыңыз:
 
-- [emotion_cnn.keras](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/download/v1.0-models/emotion_cnn.keras) — камера, интерфейс және ойын үшін негізгі модель;
+- [emotion_cnn.keras](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/download/v1.0-models/emotion_cnn.keras) — Gradio, ойын және камерадағы `--model cnn-fer` нұсқасы;
 - [emotion_mobilenet.keras](https://github.com/bakbergentoktarbek/facial-emotion-recognition/releases/download/v1.0-models/emotion_mobilenet.keras) — салыстыруға арналған екінші модель.
 
 Қайта оқыту қажет емес. Релиздегі `SHA256SUMS.txt` арқылы файлдардың тұтастығын
@@ -301,6 +330,7 @@ MobileNetV2 оқытуды бөлек іске қосу (алғашқы 10 эп�
 | `tools/prepare_kdef.py` | KDEF мұрағатын тексеру және адамдар бойынша бөлу |
 | `tools/start_kdef_training.py` | KDEF модельдерін кезекпен фондық режимде оқыту |
 | `tools/check_kdef_recovery.py` | CNN қалпына келтіруін және PNG қатесін өңдеуді тексеру |
+| `tools/check_model_inference.py` | Төрт модельдің кірісін, болжамын және кадрға жазуын камерасыз тексеру |
 | `tools/check_environment.py` | Камераны қоспай кітапханалар мен детекторларды тексеру |
 | `tools/start_training.py` | CNN-ді журналмен, PID-пен және CPU басымдығын төмендетіп фондық режимде іске қосу |
 | `tools/fetch_wheels.py` | Ірі пакеттерді PyPI-дан бөліктермен жүктеу, SHA-256 тексеру; журнал — `.wheels/download.log` |

@@ -3,7 +3,7 @@ import argparse
 import time
 import cv2
 from camera import open_camera, read_camera_frame
-from config import EMOTIONS_EN, MODEL_PATH
+from config import EMOTIONS_EN, WEBCAM_MODEL_PATH
 from face_detect import get_detector
 from predictor import EmotionPredictor, crop_face, draw_label, put_text
 
@@ -50,7 +50,7 @@ def run_webcam(cam_index, detector, predictor, backend="auto"):
             frame, ema = annotate(frame, detector, predictor, ema)
             now = time.time()
             fps, prev = 1.0 / max(now - prev, 1e-6), now
-            cv2.putText(frame, f"FPS: {fps:.0f}", (10, frame.shape[0] - 15),
+            cv2.putText(frame, f"{predictor.display_name} | FPS: {fps:.0f}", (10, frame.shape[0] - 15),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
             cv2.imshow(title, frame)
             key = cv2.waitKey(1) & 0xFF
@@ -65,7 +65,8 @@ def run_webcam(cam_index, detector, predictor, backend="auto"):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("--model", default=MODEL_PATH)
+    p.add_argument("--model", default=WEBCAM_MODEL_PATH,
+                   help="Model alias (mobilenet-kdef, cnn-kdef, cnn-fer, mobilenet-fer) or .keras path; default: mobilenet-kdef")
     p.add_argument("--detector", choices=["mediapipe", "haar"], default="mediapipe")
     p.add_argument("--camera", type=int, default=0)
     p.add_argument("--backend", choices=["auto", "dshow", "msmf", "any"], default="auto")
@@ -75,7 +76,9 @@ if __name__ == "__main__":
     detector = get_detector(args.detector)
     print("Loading emotion model and warming it up...", flush=True)
     predictor = EmotionPredictor(args.model)
-    print("Emotion model ready.", flush=True)
+    color = "grayscale" if predictor.channels == 1 else "RGB"
+    print(f"Emotion model ready: {predictor.display_name}; "
+          f"{predictor.height}x{predictor.width} {color} ({predictor.model_path.name})", flush=True)
     if args.image:
         run_image(args.image, detector, predictor)
     else:

@@ -4,23 +4,54 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-from config import EMOTIONS_EN, EMOTIONS_KZ, EMOTION_COLORS, FONT_CANDIDATES, IMG_SIZE, MODEL_PATH
+from config import EMOTIONS_EN, EMOTIONS_KZ, EMOTION_COLORS, FONT_CANDIDATES, MODEL_PATH, MODEL_ALIASES
 
 
 class EmotionPredictor:
     def __init__(self, model_path=MODEL_PATH):
-        if not Path(model_path).is_file():
+        self.model_path = Path(MODEL_ALIASES.get(str(model_path), model_path))
+        if not self.model_path.is_file():
             raise FileNotFoundError(
-                f"Model not found: {model_path}. Train CNN first; see README.md.")
+                f"Model not found: {self.model_path}. Download the matching .keras file "
+                "from the project's GitHub Releases into models/; see README.md.")
         import tensorflow as tf
-        self.model = tf.keras.models.load_model(model_path, compile=False)
-        self.model(np.zeros((1, IMG_SIZE, IMG_SIZE, 1), np.float32), training=False)  # "қыздыру"
+        self.model = tf.keras.models.load_model(self.model_path, compile=False)
+        shape = self.model.input_shape
+        if (not isinstance(shape, tuple) or len(shape) != 4 or
+                any(not isinstance(value, int) or value < 1 for value in shape[1:]) or
+                shape[-1] not in (1, 3) or self.model.output_shape != (None, len(EMOTIONS_EN))):
+            raise ValueError("Expected one image input with 1 or 3 channels and seven emotion outputs")
+        self.height, self.width, self.channels = shape[1:]
+        self.is_kdef = self.model.name in ("emotion_cnn_kdef", "emotion_mobilenet_kdef")
+        if self.is_kdef and self.height != self.width:
+            raise ValueError("KDEF preprocessing requires a square model input")
+        self.display_name = {
+            "emotion_cnn_kdef": "CNN (KDEF)",
+            "emotion_mobilenet_kdef": "MobileNetV2 (KDEF)",
+            "emotion_cnn": "CNN (FER-2013)",
+            "emotion_mobilenetv2": "MobileNetV2 (FER-2013)",
+        }.get(self.model.name, self.model_path.stem)
+        self.model(np.zeros((1, self.height, self.width, self.channels), np.float32), training=False)
 
-    @staticmethod
-    def preprocess(face_bgr):
-        gray = cv2.cvtColor(face_bgr, cv2.COLOR_BGR2GRAY)
-        gray = cv2.resize(gray, (IMG_SIZE, IMG_SIZE), interpolation=cv2.INTER_AREA)
-        return gray.astype("float32")[None, ..., None]  # (1, 48, 48, 1): batch + channel өлшемдері
+    def preprocess(self, face_bgr):
+        if (not isinstance(face_bgr, np.ndarray) or face_bgr.size == 0 or
+                face_bgr.ndim != 3 or face_bgr.shape[-1] != 3):
+            raise ValueError("Expected a nonempty BGR face image with three channels")
+        if self.is_kdef:
+            # TensorFlow crop/grayscale/resize/round must match the training
+            # transform. OpenCV supplies BGR; KDEF was decoded as RGB.
+            from data_kdef import prepare_image
+            rgb = cv2.cvtColor(face_bgr, cv2.COLOR_BGR2RGB)
+            image = prepare_image(rgb, self.height, self.channels).numpy()
+        else:
+            # Preserve the exact preprocessing used by the original FER demo.
+            conversion = cv2.COLOR_BGR2GRAY if self.channels == 1 else cv2.COLOR_BGR2RGB
+            image = cv2.cvtColor(face_bgr, conversion)
+            image = cv2.resize(image, (self.width, self.height), interpolation=cv2.INTER_AREA)
+            if self.channels == 1:
+                image = image[..., None]
+        # Scaling is already inside every saved project model.
+        return image.astype("float32")[None, ...]
 
     def predict(self, face_bgr):
         # model(...) бір сурет үшін model.predict(...)-тен бірнеше есе жылдам

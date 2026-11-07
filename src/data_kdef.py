@@ -10,6 +10,21 @@ MANIFEST = ROOT / "reports/kdef/data_split_seed42.json"
 PREPROCESSING = "RGB JPEG; trim top/bottom 8% with fixed crop; resize; CNN grayscale, MobileNet RGB; values 0..255"
 
 
+def prepare_image(image_rgb, size, channels):
+    """The same deterministic input transform for KDEF training and inference."""
+    import tensorflow as tf
+
+    height = tf.shape(image_rgb)[0]
+    trim = tf.cast(tf.cast(height, tf.float32) * 0.08, tf.int32)
+    image = image_rgb[trim:height - trim, :, :]
+    if channels == 1:
+        image = tf.image.rgb_to_grayscale(image)
+    image = tf.image.resize(image, (size, size), antialias=True)
+    image = tf.cast(tf.clip_by_value(tf.round(image), 0, 255), tf.uint8)
+    image.set_shape((size, size, channels))
+    return image
+
+
 def read_manifest(path=MANIFEST):
     path = Path(path)
     manifest = json.loads(path.read_text(encoding="utf-8"))
@@ -52,15 +67,7 @@ def make_dataset(manifest, root, split, size, channels, batch=32, training=False
 
     def decode(path, label):
         image = tf.io.decode_jpeg(tf.io.read_file(path), channels=3)
-        height = tf.shape(image)[0]
-        trim = tf.cast(tf.cast(height, tf.float32) * 0.08, tf.int32)
-        image = image[trim:height - trim, :, :]
-        if channels == 1:
-            image = tf.image.rgb_to_grayscale(image)
-        image = tf.image.resize(image, (size, size), antialias=True)
-        image = tf.cast(tf.clip_by_value(tf.round(image), 0, 255), tf.uint8)
-        image.set_shape((size, size, channels))
-        return image, label
+        return prepare_image(image, size, channels), label
 
     # Cache uint8 images, rather than large float32 RGB tensors.
     dataset = dataset.map(decode, num_parallel_calls=4).cache()
