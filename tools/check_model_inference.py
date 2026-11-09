@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
@@ -65,6 +66,18 @@ def main():
             np.testing.assert_array_equal(rgb_batch[..., 0], 255)
             np.testing.assert_array_equal(rgb_batch[..., 1:], 0)
         emotion, confidence, probabilities = predictor.predict(image)
+        eager = predictor.model(batch, training=False).numpy()[0]
+        np.testing.assert_allclose(probabilities, eager, atol=1e-5, rtol=1e-4)
+        timings = {}
+        for name, infer in (
+                ("previous", lambda: predictor.model(predictor.preprocess(image), training=False).numpy()),
+                ("optimized", lambda: predictor.predict(image))):
+            infer()
+            started = time.perf_counter()
+            for _ in range(20):
+                infer()
+            timings[name] = (time.perf_counter() - started) * 1000 / 20
+        print(f"Inference including preprocessing (20 faces): {timings}", flush=True)
         assert probabilities.shape == (7,) and np.isfinite(probabilities).all()
         assert 0 <= confidence <= 1
         np.testing.assert_allclose(probabilities.sum(), 1, atol=1e-5)

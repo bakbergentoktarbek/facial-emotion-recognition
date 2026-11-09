@@ -31,7 +31,14 @@ class EmotionPredictor:
             "emotion_cnn": "CNN (FER-2013)",
             "emotion_mobilenetv2": "MobileNetV2 (FER-2013)",
         }.get(self.model.name, self.model_path.stem)
-        self.model(np.zeros((1, self.height, self.width, self.channels), np.float32), training=False)
+        # Trace once at startup instead of executing every Keras layer through
+        # Python for each face. Fixed input shape avoids repeated tracing.
+        self._infer = tf.function(
+            lambda batch: self.model(batch, training=False),
+            input_signature=[tf.TensorSpec(
+                (1, self.height, self.width, self.channels), tf.float32)],
+        )
+        self._infer(np.zeros((1, self.height, self.width, self.channels), np.float32))
 
     def preprocess(self, face_bgr):
         if (not isinstance(face_bgr, np.ndarray) or face_bgr.size == 0 or
@@ -54,8 +61,8 @@ class EmotionPredictor:
         return image.astype("float32")[None, ...]
 
     def predict(self, face_bgr):
-        # model(...) бір сурет үшін model.predict(...)-тен бірнеше есе жылдам
-        probs = self.model(self.preprocess(face_bgr), training=False).numpy()[0]
+        # Reuse the warmed inference graph for each face.
+        probs = self._infer(self.preprocess(face_bgr)).numpy()[0]
         i = int(np.argmax(probs))
         return EMOTIONS_EN[i], float(probs[i]), probs
 
